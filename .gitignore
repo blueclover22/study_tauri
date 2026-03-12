@@ -1,0 +1,72 @@
+
+# Logs
+logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+
+# Dependency directories
+node_modules
+jspm_packages
+
+# Build outputs
+dist
+dist-ssr
+*.local
+
+# Tauri build artifacts
+src-tauri/target
+src-tauri/gen/apple
+src-tauri/binaries
+
+# IDE - VS Code
+.vscode
+
+
+# IDE - IntelliJ/WebStorm
+.idea
+
+# OS - Windows
+Thumbs.db
+Thumbs.db:encryptable
+ehthumbs.db
+ehthumbs_vista.db
+*.stackdump
+[Dd]esktop.ini
+$RECYCLE.BIN/
+*.cab
+*.msi
+*.msix
+*.msm
+*.msp
+*.lnk
+
+# OS - macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+Icon
+._*
+.DocumentRevisions-V1
+.fseventsd
+.Spotlight-V100
+.TemporaryItems
+.Trashes
+.VolumeIcon.icns
+.com.apple.timemachine.donotpresent
+
+# Editor files
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+*.bak
+*.patch
+*.diff
+
+# TypeScript
+*.tsbuildinfo
