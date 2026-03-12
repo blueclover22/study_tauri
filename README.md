@@ -152,8 +152,27 @@ pnpm add -g @tauri-apps/cli
 
 ---
 
+## Tauri + Spring Boot 연동 구조
+### Tauri App
+#### WebView (Renderer) — React / Vue / 기존 웹 UI
+- 온라인 API 호출 → fetch() → Spring Boot
+- 로컬 처리 호출 → invoke() → Rust Core
 
-## 스프링부트 연동 시 구조
+#### Rust Core
+- 프린터 / 하드웨어 제어 — serialport (Rust crate)
+- 시리얼 통신 — tokio-serial
+- 로컬 DB — sqlx + SQLite
+- 오프라인 sync queue
+- 자동 업데이트 — tauri-updater
+
+### Spring Boot (HTTP 통신)
+- 메뉴 / 재고 관리
+- 매출 / 현황
+- 멀티 포스 동기화
+
+### DB
+Spring Boot와 연결
+
 
 ```
 ┌─────────────────────────────────────────────┐
