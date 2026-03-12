@@ -97,7 +97,7 @@ graph TD
             UPDATER[자동 업데이트 - tauri-plugin-updater]
         end
         
-        UI <-> |"IPC (Commands/Events)"| MAIN
+        UI --- |"IPC (Commands/Events)"| MAIN
     end
 
     subgraph "Backend Server"
@@ -105,7 +105,7 @@ graph TD
         DB[(External DB)]
     end
 
-    MAIN <-> |HTTP/HTTPS| SB
+    MAIN --- |HTTP/HTTPS| SB
     SB <--> DB
 
     %% 상세 설명 연결
