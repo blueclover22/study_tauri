@@ -1,5 +1,13 @@
 import React, { useState } from "react";
+import { invoke } from "@tauri-apps/api/core";
+import { IpcResponse } from "../types/ipc";
 import "./DeviceManagement.css";
+
+interface DeviceStatusInfo {
+  id: string;
+  status: "connected" | "disconnected" | "error";
+  last_checked: string;
+}
 
 interface DeviceStatus {
   id: string;
@@ -58,16 +66,26 @@ export const DeviceManagement: React.FC<DeviceManagementProps> = ({
 
   const [isRefreshing, setIsRefreshing] = useState(false);
 
-  const refreshStatus = () => {
+  const refreshStatus = async () => {
     setIsRefreshing(true);
-    // 실제 구현에서는 여기서 Tauri invoke를 통해 장치 상태를 체크합니다.
-    setTimeout(() => {
-      setDevices(prev => prev.map(device => ({
-        ...device,
-        lastChecked: new Date().toLocaleTimeString()
-      })));
+    try {
+      const result = await invoke<IpcResponse<DeviceStatusInfo[]>>("device_check_status");
+      if (result.success && result.data) {
+        const statusMap = new Map(result.data.map((d) => [d.id, d]));
+        setDevices((prev) =>
+          prev.map((device) => {
+            const updated = statusMap.get(device.id);
+            return updated
+              ? { ...device, status: updated.status, lastChecked: updated.last_checked }
+              : device;
+          })
+        );
+      }
+    } catch {
+      // invoke 수준 오류 (커맨드를 찾을 수 없는 경우 등) — 현재 상태 유지
+    } finally {
       setIsRefreshing(false);
-    }, 1000);
+    }
   };
 
   const getStatusColor = (status: string) => {

@@ -41,12 +41,33 @@ impl HttpClient {
     }
 
     /// 현재 저장된 Bearer 토큰 문자열을 반환합니다.
-    #[allow(dead_code)]
     pub fn get_auth_header(&self) -> Option<String> {
         self.auth_token
             .lock()
             .ok()?
             .as_ref()
             .map(|t| format!("Bearer {}", t))
+    }
+
+    /// 저장된 Bearer 토큰을 Authorization 헤더에 자동 주입한 POST 요청을 반환합니다.
+    /// 인증이 필요한 API Command에서 사용합니다.
+    #[allow(dead_code)]
+    pub fn post_with_auth(&self, url: &str) -> reqwest::RequestBuilder {
+        let req = self.client.post(url);
+        match self.get_auth_header() {
+            Some(header) => req.header(header::AUTHORIZATION, header),
+            None => req,
+        }
+    }
+
+    /// 저장된 Bearer 토큰을 Authorization 헤더에 자동 주입한 GET 요청을 반환합니다.
+    /// 인증이 필요한 API Command에서 사용합니다.
+    #[allow(dead_code)]
+    pub fn get_with_auth(&self, url: &str) -> reqwest::RequestBuilder {
+        let req = self.client.get(url);
+        match self.get_auth_header() {
+            Some(header) => req.header(header::AUTHORIZATION, header),
+            None => req,
+        }
     }
 }

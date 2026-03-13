@@ -20,13 +20,11 @@ export const Login: React.FC<LoginProps> = ({ onLoginSuccess }) => {
     }
     try {
       const userInfo = await login({ userId: username, userPwd: password });
-      console.log("[Login] userInfo:", userInfo);
       if (userInfo) {
         onLoginSuccess(userInfo.userNm || userInfo.userId || username);
       }
     } catch (err) {
       // useAuth가 모든 에러를 잡으므로 이 경로는 타지 않아야 함
-      console.error("[Login] Unexpected error:", err);
       setError("예상치 못한 오류가 발생했습니다.");
     }
   };

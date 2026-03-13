@@ -13,7 +13,10 @@ pub fn run() {
     tauri::Builder::default()
         .manage(HttpClient::new())
         .plugin(tauri_plugin_opener::init())
-        .invoke_handler(tauri::generate_handler![commands::auth::auth_login])
+        .invoke_handler(tauri::generate_handler![
+            commands::auth::auth_login,
+            commands::device::device_check_status,
+        ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
 }
