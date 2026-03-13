@@ -432,7 +432,18 @@ Rust Command는 `Result<IpcResult, String>` 타입을 반환합니다. **에러 
 
 ---
 
-## 🛠 6. 트러블슈팅 (Troubleshooting)
+## ⚠️ 6. 알려진 제한사항 (Known Limitations)
+
+| 항목 | 현재 상태 | 향후 개선 방향 |
+| :--- | :--- | :--- |
+| **인증 토큰 유지** | `HttpClient` 내부 `Mutex<Option<String>>`에 메모리 저장 → **앱 재시작 시 토큰 소멸, 재로그인 필요** | `tauri-plugin-stronghold` 또는 OS Keychain을 통한 안전한 영구 저장 |
+| **장치 상태 확인** | `device_check_status` 커맨드는 현재 **스텁(Stub) 구현** — 하드코딩된 mock 상태 반환 | `serialport` 크레이트를 통한 실제 COM/USB 포트 ping 연동 |
+| **오프라인 지원** | 현재 미구현 — 네트워크 단절 시 모든 요청 실패 | `rusqlite` + 큐 기반 오프라인 Sync 구현 |
+| **자동 업데이트** | 미구현 | `tauri-plugin-updater` 연동 |
+
+---
+
+## 🛠 7. 트러블슈팅 (Troubleshooting)
 
 ### 빌드 오류 발생 시 해결 방법
 
@@ -463,15 +474,15 @@ pnpm tauri dev
 
 ---
 
-## 🚀 7. 빌드 및 배포 (Build & Package)
+## 🚀 8. 빌드 및 배포 (Build & Package)
 
-### 7.1 애플리케이션 빌드
+### 8.1 애플리케이션 빌드
 설치 프로그램(Installer)을 생성합니다. (결과물: `src-tauri/target/release/bundle/`)
 ```bash
 pnpm tauri build
 ```
 
-### 7.2 빌드 타겟 옵션 (고급)
+### 8.2 빌드 타겟 옵션 (고급)
 
 기본적으로 현재 머신의 플랫폼과 아키텍처로 빌드됩니다. 특정 환경을 위한 빌드가 필요할 경우 아래 옵션을 사용합니다.
 
