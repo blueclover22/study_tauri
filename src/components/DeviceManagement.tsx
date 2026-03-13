@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import "./DeviceManagement.css";
 
 interface DeviceStatus {
@@ -111,8 +111,8 @@ export const DeviceManagement: React.FC<DeviceManagementProps> = ({
             <h2>장치 연결 상태</h2>
             <p>현재 시스템에 연결된 주변 장치의 상태를 확인하고 테스트합니다.</p>
           </div>
-          <button 
-            className={`refresh-button ${isRefreshing ? 'loading' : ''}`} 
+          <button
+            className={`refresh-button ${isRefreshing ? 'loading' : ''}`}
             onClick={refreshStatus}
             disabled={isRefreshing}
           >
@@ -129,12 +129,12 @@ export const DeviceManagement: React.FC<DeviceManagementProps> = ({
                   <h3>{device.name}</h3>
                   <span className="device-type">{device.type}</span>
                 </div>
-                <div 
-                  className="status-indicator" 
+                <div
+                  className="status-indicator"
                   style={{ backgroundColor: getStatusColor(device.status) }}
                 ></div>
               </div>
-              
+
               <div className="device-card-body">
                 <div className="info-row">
                   <span className="label">상태:</span>

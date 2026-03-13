@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { invoke } from "@tauri-apps/api/core";
+import { useAuth } from "../hooks/useAuth";
 import "./Login.css";
 
 interface LoginProps {
@@ -9,37 +9,25 @@ interface LoginProps {
 export const Login: React.FC<LoginProps> = ({ onLoginSuccess }) => {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
-  const [error, setError] = useState("");
-  const [isLoading, setIsLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
+  const { login, isLoading, error, setError, clearError } = useAuth();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setError("");
-    setIsLoading(true);
-
+    if (!username.trim() || !password.trim()) {
+      setError("사용자명과 비밀번호를 입력해주세요");
+      return;
+    }
     try {
-      if (!username.trim() || !password.trim()) {
-        setError("사용자명과 비밀번호를 입력해주세요");
-        setIsLoading(false);
-        return;
-      }
-
-      const result = await invoke("verify_credentials", {
-        username,
-        password,
-      });
-
-      if (result) {
-        onLoginSuccess(username);
-      } else {
-        setError("사용자명 또는 비밀번호가 올바르지 않습니다");
+      const userInfo = await login({ userId: username, userPwd: password });
+      console.log("[Login] userInfo:", userInfo);
+      if (userInfo) {
+        onLoginSuccess(userInfo.userNm || userInfo.userId || username);
       }
     } catch (err) {
-      setError("로그인 중 오류가 발생했습니다");
-      console.error(err);
-    } finally {
-      setIsLoading(false);
+      // useAuth가 모든 에러를 잡으므로 이 경로는 타지 않아야 함
+      console.error("[Login] Unexpected error:", err);
+      setError("예상치 못한 오류가 발생했습니다.");
     }
   };
 
@@ -47,7 +35,7 @@ export const Login: React.FC<LoginProps> = ({ onLoginSuccess }) => {
     <div className="login-container">
       <div className="login-box">
         <div className="login-header">
-          <h1>POS 시스템</h1>
+          <h1>POS 시스템 (Tauri)</h1>
           <p>관리자 로그인</p>
         </div>
 
@@ -58,7 +46,10 @@ export const Login: React.FC<LoginProps> = ({ onLoginSuccess }) => {
               id="username"
               type="text"
               value={username}
-              onChange={(e) => setUsername(e.target.value)}
+              onChange={(e) => {
+                setUsername(e.target.value);
+                clearError();
+              }}
               placeholder="사용자명을 입력하세요"
               disabled={isLoading}
               autoComplete="username"
@@ -73,7 +64,10 @@ export const Login: React.FC<LoginProps> = ({ onLoginSuccess }) => {
                 id="password"
                 type={showPassword ? "text" : "password"}
                 value={password}
-                onChange={(e) => setPassword(e.target.value)}
+                onChange={(e) => {
+                  setPassword(e.target.value);
+                  clearError();
+                }}
                 placeholder="비밀번호를 입력하세요"
                 disabled={isLoading}
                 autoComplete="current-password"
@@ -90,19 +84,28 @@ export const Login: React.FC<LoginProps> = ({ onLoginSuccess }) => {
             </div>
           </div>
 
-          {error && <div className="error-message">{error}</div>}
+          {error && (
+            <div
+              className={`error-message ${
+                error.includes("서버에 연결할 수 없습니다")
+                  ? "error-message--server"
+                  : ""
+              }`}
+            >
+              {error.includes("서버에 연결할 수 없습니다") && (
+                <span className="error-icon">⚠ </span>
+              )}
+              {error}
+            </div>
+          )}
 
-          <button
-            type="submit"
-            className="login-button"
-            disabled={isLoading}
-          >
+          <button type="submit" className="login-button" disabled={isLoading}>
             {isLoading ? "로그인 중..." : "로그인"}
           </button>
         </form>
 
         <div className="login-footer">
-          <p>POS System v1.0</p>
+          <p>POS System v1.0 | Tauri Edition</p>
         </div>
       </div>
 

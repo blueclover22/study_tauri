@@ -71,7 +71,7 @@ export const MainMenu: React.FC<MainMenuProps> = ({
     <div className="main-menu-container">
       <header className="menu-header">
         <div className="header-left">
-          <h1>POS 시스템</h1>
+          <h1>POS 시스템 (Tauri)</h1>
         </div>
         <div className="header-right">
           <span className="user-greeting">{username}님 반갑습니다</span>
@@ -115,7 +115,7 @@ export const MainMenu: React.FC<MainMenuProps> = ({
       </main>
 
       <footer className="menu-footer">
-        <p>POS System v1.0 | © 2026</p>
+        <p>POS System v1.0 | © 2026 Tauri Edition</p>
       </footer>
     </div>
   );

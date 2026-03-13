@@ -1,39 +1,19 @@
-use serde::{Deserialize, Serialize};
+mod commands;
+mod config;
+mod services;
+mod types;
+mod utils;
 
-#[derive(Serialize, Deserialize)]
-pub struct User {
-    pub username: String,
-    pub password: String,
-}
+use services::HttpClient;
 
-#[tauri::command]
-fn greet(name: &str) -> String {
-    format!("Hello, {}! You've been greeted from Rust!", name)
-}
-
-#[tauri::command]
-fn verify_credentials(username: &str, password: &str) -> bool {
-    let default_users = vec![
-        User {
-            username: "admin".to_string(),
-            password: "admin123".to_string(),
-        },
-        User {
-            username: "user".to_string(),
-            password: "user123".to_string(),
-        },
-    ];
-
-    default_users
-        .iter()
-        .any(|user| user.username == username && user.password == password)
-}
-
+/// 전체 Tauri Command를 한 곳에서 등록하는 오케스트레이터.
+/// Electron의 `setupIpcHandlers()` (ipcHandlers.ts) 역할을 대체합니다.
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
     tauri::Builder::default()
+        .manage(HttpClient::new())
         .plugin(tauri_plugin_opener::init())
-        .invoke_handler(tauri::generate_handler![greet, verify_credentials])
+        .invoke_handler(tauri::generate_handler![commands::auth::auth_login])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
 }

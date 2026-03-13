@@ -1,0 +1,11 @@
+# src-tauri/.cargo/config.toml
+# URL 변경은 이 파일 한 곳만 수정하면 됩니다.
+# Rust 코드는 빌드 프로파일(여부)(개발/운영)에 따라자동으로 선택합니다.
+
+[env]
+# 개발 환경: `pnpm tauri dev` (debug 프로파일)
+API_BASE_URL_DEV = "http://localhost:6808"
+# 운영 환경: `pnpm tauri build` (release 프로파일)
+API_BASE_URL_PROD = "https://api.example.com"
+# POS 단말기 Device ID (장치별로 변경해서 사용)
+POS_DEVICE_ID = "f067595a067c3e00"
