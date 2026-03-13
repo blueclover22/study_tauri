@@ -380,9 +380,24 @@ export const ticketService = {
 
 ### 4.4 에러 처리 전략 (Error Handling)
 
-Rust Command는 `Result<IpcResult, String>` 타입을 반환합니다. **에러 포함 모든 경우 `Ok(IpcResult)`로 반환**하며, 에러 정보는 `IpcResult.success = false`와 `IpcResult.error` 필드에 담습니다. JavaScript 서비스 레이어(`src/api/`)에서 `result.success === false`를 확인하여 `throw new Error()`로 변환하고, Hook에서 catch하여 UI 에러 상태를 업데이트합니다. 모든 도메인 핸들러가 일관된 에러 메시지 포맷을 사용하도록 Rust `utils.rs`(`handle_reqwest_error`)로 공통 처리합니다.
+본 프로젝트는 Tauri의 기본 에러 반환 방식을 넘어서는 **결과 래핑 패턴(Result Wrapping Pattern)**을 채택하고 있습니다.
 
-> **Electron 비교**: Electron의 `handleAxiosError()` 유틸 함수 역할을 Rust의 공통 에러 변환 함수 또는 `map_err()`가 대체합니다.
+#### 핵심 원칙: "Ok-Only" 응답 패턴
+Rust Command의 시그니처는 `Result<IpcResult, String>`이지만, **실제 비즈니스 로직의 모든 결과(에러 포함)는 `Ok(IpcResult)`로 반환**합니다.
+
+1.  **이유:** `Err()`를 반환하면 Tauri가 JS의 `Promise.reject`로 던져버려 무조건 `catch` 블록으로 떨어집니다. 이는 시스템 예외와 비즈니스 실패(비밀번호 틀림 등)를 구분하기 어렵게 만듭니다.
+2.  **동작:** 
+    *   **Rust:** 실패 시 `Ok(IpcResult::err("메시지"))` 반환.
+    *   **TypeScript:** `result.success` 필드를 검사하여 실패일 경우 Service 레이어에서만 `throw new Error()`를 발생시킵니다.
+3.  **장점:** 프론트엔드와 백엔드 간에 일관된 JSON 응답 규격을 유지할 수 있으며, 시스템 수준의 치명적 오류(Panic)와 사용자 수준의 비즈니스 에러를 명확히 분리합니다.
+
+| 오류 유형 | Rust 반환 방식 | JS 처리 위치 | UI 상태 |
+| :--- | :--- | :--- | :--- |
+| **시스템/Panic** | `Err(String)` | `catch (invokeErr)` | 시스템 오류 팝업 |
+| **비즈니스 에러** | `Ok(IpcResult::err)` | `if (!result.success)` | 에러 메시지 박스 |
+| **성공** | `Ok(IpcResult::ok)` | `return result.data` | 데이터 렌더링 |
+
+> **Electron 비교**: Electron의 `handleAxiosError()` 유틸 함수 역할을 Rust의 `utils.rs`(`handle_reqwest_error`)가 대체하여 한국어 메시지로 일괄 변환합니다.
 
 | 오류 유형 | 조건 | 사용자 메시지 | UI 표시 |
 | :--- | :--- | :--- | :--- |
